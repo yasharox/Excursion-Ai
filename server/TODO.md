@@ -1,0 +1,3 @@
+- [ ] Identify and fix the Gemini error
+- [ ] Verify the endpoint behavior by running the server
+- [ ] Ensure stream endpoint returns valid SSE and JSON shape
