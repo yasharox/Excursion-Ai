@@ -47,15 +47,36 @@ export async function bookTour(tourId, adultsCount, childrenCount) {
 export async function searchTours(filters) {
   const query = {};
 
-  if (filters.destination) query.destination = filters.destination;
-  if (filters.category) query.category = filters.category;
+  // ✅ FIX 1: Case-insensitive destination search
+  if (filters.destination && filters.destination.trim()) {
+    query.destination = { $regex: filters.destination, $options: "i" };
+  }
+  // ✅ FIX 2: Case-insensitive category search
+  if (filters.category && filters.category.trim()) {
+    query.category = { $regex: filters.category, $options: "i" };
+  }
   if (filters.status) query.status = filters.status;
-  if (filters.minPrice) query["pricing.adults"] = { $gte: filters.minPrice };
-  if (filters.maxPrice)
-    query["pricing.adults"] = {
-      ...query["pricing.adults"],
-      $lte: filters.maxPrice,
-    };
+  // ✅ FIX 3: Convert price strings to numbers
+  if (filters.minPrice) {
+    const minPrice = parseFloat(filters.minPrice);
+    if (!isNaN(minPrice)) {
+      query["pricing.adults"] = { $gte: minPrice };
+    }
+  }
+  if (filters.maxPrice) {
+    const maxPrice = parseFloat(filters.maxPrice);
+    if (!isNaN(maxPrice)) {
+      if (query["pricing.adults"]) {
+        query["pricing.adults"].$lte = maxPrice;
+      } else {
+        query["pricing.adults"] = { $lte: maxPrice };
+      }
+    }
+  }
 
-  return await Tour.find(query);
+  console.log("🔍 Filter Query:", query); // Debug log
+  const results = await Tour.find(query);
+  console.log(`📊 Found ${results.length} tours`); // Debug log
+
+  return results;
 }

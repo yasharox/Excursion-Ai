@@ -10,10 +10,10 @@ import {
   FormControl,
   InputLabel,
 } from "@mui/material";
-import { Search, FilterList } from "@mui/icons-material";
+import { Search, List } from "@mui/icons-material";
 
 export function FilterBar({ onFilter }) {
-  const [filters, setFilters] = useState({
+  const [s, sets] = useState({
     destination: "",
     category: "",
     minPrice: "",
@@ -22,36 +22,43 @@ export function FilterBar({ onFilter }) {
   });
 
   const handleChange = (field, value) => {
-    setFilters((prev) => ({ ...prev, [field]: value }));
+    sets((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleApplyFilters = () => {
-    onFilter(filters);
+  const initialFilters = {
+    destination: "",
+    category: "",
+    minPrice: "",
+    maxPrice: "",
+    ageGroup: "",
   };
 
   const handleReset = () => {
-    setFilters({
-      destination: "",
-      category: "",
-      minPrice: "",
-      maxPrice: "",
-      ageGroup: "",
-    });
-    onFilter({});
+    sets(initialFilters);
+    onFilter(initialFilters);
+  };
+
+  const handleApplys = () => {
+    const filters = Object.fromEntries(
+      Object.entries(s).filter(([_, value]) => value !== ""),
+    );
+
+    onFilter(filters);
+    sets(initialFilters);
   };
 
   return (
     <Card sx={{ p: 2, mb: 3 }}>
       <Box display="flex" alignItems="center" gap={1} mb={2}>
-        <FilterList color="primary" />
-        <h3>Filter Tours</h3>
+        <List color="primary" />
+        <h3> Tours</h3>
       </Box>
 
       <Stack spacing={2}>
         <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
           <TextField
             placeholder="Destination"
-            value={filters.destination}
+            value={s.destination}
             onChange={(e) => handleChange("destination", e.target.value)}
             fullWidth
             size="small"
@@ -60,7 +67,7 @@ export function FilterBar({ onFilter }) {
           <FormControl fullWidth size="small">
             <InputLabel>Category</InputLabel>
             <Select
-              value={filters.category}
+              value={s.category}
               onChange={(e) => handleChange("category", e.target.value)}
               label="Category"
             >
@@ -75,7 +82,7 @@ export function FilterBar({ onFilter }) {
           <FormControl fullWidth size="small">
             <InputLabel>Age Group</InputLabel>
             <Select
-              value={filters.ageGroup}
+              value={s.ageGroup}
               onChange={(e) => handleChange("ageGroup", e.target.value)}
               label="Age Group"
             >
@@ -91,7 +98,7 @@ export function FilterBar({ onFilter }) {
           <TextField
             type="number"
             placeholder="Min Price"
-            value={filters.minPrice}
+            value={s.minPrice}
             onChange={(e) => handleChange("minPrice", e.target.value)}
             fullWidth
             size="small"
@@ -100,7 +107,7 @@ export function FilterBar({ onFilter }) {
           <TextField
             type="number"
             placeholder="Max Price"
-            value={filters.maxPrice}
+            value={s.maxPrice}
             onChange={(e) => handleChange("maxPrice", e.target.value)}
             fullWidth
             size="small"
@@ -110,7 +117,7 @@ export function FilterBar({ onFilter }) {
             <Button
               variant="contained"
               color="primary"
-              onClick={handleApplyFilters}
+              onClick={handleApplys}
               startIcon={<Search />}
               sx={{ flex: 1 }}
             >

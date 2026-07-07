@@ -14,7 +14,7 @@ import { TourCard } from "../components/TourCard";
 import { AIRecommendation } from "../components/AIRecommendation";
 import { FilterBar } from "../components/FilterBar";
 
-const API_BASE_URL = "http://localhost:3001/api";
+export const API_BASE_URL = "http://localhost:3001/api";
 
 export function Home() {
   const [tours, setTours] = useState([]);
