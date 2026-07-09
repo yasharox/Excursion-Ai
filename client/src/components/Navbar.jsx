@@ -28,7 +28,12 @@ export function Navbar() {
           </Typography>
         </Box>
 
-        <Box display="flex" gap={2}>
+        <Box
+          display="flex"
+          flexWrap="wrap"
+          justifyContent="flex-end"
+          gap={{ xs: 0.5, sm: 1.5 }}
+        >
           {navItems.map((item) => (
             <Button
               key={item.path}
@@ -37,6 +42,9 @@ export function Navbar() {
               sx={{
                 color: location.pathname === item.path ? "#ff9800" : "white",
                 fontWeight: 600,
+                minWidth: 90,
+                paddingX: { xs: 1, sm: 2 },
+                fontSize: { xs: "0.78rem", sm: "0.9rem" },
                 position: "relative",
                 "&:after": {
                   content: '""',

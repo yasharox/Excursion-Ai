@@ -22,6 +22,7 @@ export function FilterBar({ onFilter }) {
   });
 
   const handleChange = (field, value) => {
+    console.log(field, value);
     sets((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -55,7 +56,12 @@ export function FilterBar({ onFilter }) {
       </Box>
 
       <Stack spacing={2}>
-        <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          spacing={2}
+          sx={{ width: "100%" }}
+        >
+          {/* Destination */}
           <TextField
             placeholder="Destination"
             value={s.destination}
@@ -63,7 +69,7 @@ export function FilterBar({ onFilter }) {
             fullWidth
             size="small"
           />
-
+          {/* category */}
           <FormControl fullWidth size="small">
             <InputLabel>Category</InputLabel>
             <Select
@@ -72,13 +78,13 @@ export function FilterBar({ onFilter }) {
               label="Category"
             >
               <MenuItem value="">All</MenuItem>
-              <MenuItem value="beach">Beach</MenuItem>
-              <MenuItem value="adventure">Adventure</MenuItem>
-              <MenuItem value="cultural">Cultural</MenuItem>
-              <MenuItem value="water">Water Sports</MenuItem>
+              <MenuItem value="Beach">Beach</MenuItem>
+              <MenuItem value="Adventure">Adventure</MenuItem>
+              <MenuItem value="Cultural">Cultural</MenuItem>
+              <MenuItem value="Water Sports">Water Sports</MenuItem>
             </Select>
           </FormControl>
-
+          {/* Age Group */}
           <FormControl fullWidth size="small">
             <InputLabel>Age Group</InputLabel>
             <Select
@@ -87,13 +93,14 @@ export function FilterBar({ onFilter }) {
               label="Age Group"
             >
               <MenuItem value="">All</MenuItem>
-              <MenuItem value="adults_only">Adults Only</MenuItem>
-              <MenuItem value="family">Family Friendly</MenuItem>
+              <MenuItem value="Adults Only">Adults Only</MenuItem>
+              <MenuItem value="Family Friendly">Family Friendly</MenuItem>
               <MenuItem value="kids">Kids</MenuItem>
             </Select>
           </FormControl>
         </Stack>
 
+        {/* minprice */}
         <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
           <TextField
             type="number"
@@ -104,6 +111,7 @@ export function FilterBar({ onFilter }) {
             size="small"
           />
 
+          {/* minprice */}
           <TextField
             type="number"
             placeholder="Max Price"
@@ -113,13 +121,18 @@ export function FilterBar({ onFilter }) {
             size="small"
           />
 
-          <Stack direction="row" spacing={1}>
+          {/* filter */}
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={1}
+            sx={{ width: "100%" }}
+          >
             <Button
               variant="contained"
               color="primary"
               onClick={handleApplys}
               startIcon={<Search />}
-              sx={{ flex: 1 }}
+              sx={{ width: { xs: "100%", sm: "auto" }, flex: 1 }}
             >
               Filter
             </Button>
@@ -127,7 +140,7 @@ export function FilterBar({ onFilter }) {
               variant="outlined"
               color="primary"
               onClick={handleReset}
-              sx={{ flex: 1 }}
+              sx={{ width: { xs: "100%", sm: "auto" }, flex: 1 }}
             >
               Reset
             </Button>

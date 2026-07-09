@@ -33,7 +33,7 @@ const tourSchema = new mongoose.Schema({
 
   // Category
   category: String, // 'beach', 'adventure', 'cultural', 'water', etc.
-  ageRequirement: { type: String, default: "all" }, // 'all', 'adults_only', 'kids', etc.
+  ageGroup: { type: String, default: "all" }, // 'all', 'adults_only', 'kids', etc.
 
   // Ratings & Reviews
   highlights: [String],

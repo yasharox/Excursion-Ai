@@ -45,7 +45,7 @@ export function Home() {
   const handleBook = async (bookingData) => {
     try {
       await axios.post(`${API_BASE_URL}/tours/book`, bookingData);
-      alert("Tour booked successfully!");
+      alert("Tour booked successfully!🥂");
       fetchTours();
     } catch (err) {
       alert("Booking failed: " + err.message);
@@ -114,7 +114,11 @@ export function Home() {
               : soldOutTours
           ).map((tour) => (
             <Grid item xs={12} sm={6} md={4} key={tour._id}>
-              <TourCard tour={tour} onBook={handleBook} />
+              <TourCard
+                tour={tour}
+                onBook={handleBook}
+                onRefresh={fetchTours}
+              />
             </Grid>
           ))}
         </Grid>

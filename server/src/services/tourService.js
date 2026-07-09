@@ -20,6 +20,18 @@ export async function updateTourStatus(tourId, status) {
   return await Tour.findByIdAndUpdate(tourId, { status }, { new: true });
 }
 
+export async function changeStatus(tourId, status) {
+  const tour = await Tour.findById(tourId);
+
+  if (!tour) {
+    throw new Error("Tour not found");
+  }
+  tour.status = status;
+
+  await tour.save();
+  return tour;
+}
+
 export async function bookTour(tourId, adultsCount, childrenCount) {
   const tour = await Tour.findById(tourId);
   if (!tour) throw new Error("Tour not found");
@@ -47,36 +59,83 @@ export async function bookTour(tourId, adultsCount, childrenCount) {
 export async function searchTours(filters) {
   const query = {};
 
-  // ✅ FIX 1: Case-insensitive destination search
+  // ✅ Destination - case-insensitive
   if (filters.destination && filters.destination.trim()) {
     query.destination = { $regex: filters.destination, $options: "i" };
   }
-  // ✅ FIX 2: Case-insensitive category search
+
+  // ✅ Category - case-insensitive
   if (filters.category && filters.category.trim()) {
     query.category = { $regex: filters.category, $options: "i" };
   }
-  if (filters.status) query.status = filters.status;
-  // ✅ FIX 3: Convert price strings to numbers
-  if (filters.minPrice) {
-    const minPrice = parseFloat(filters.minPrice);
-    if (!isNaN(minPrice)) {
-      query["pricing.adults"] = { $gte: minPrice };
-    }
-  }
-  if (filters.maxPrice) {
-    const maxPrice = parseFloat(filters.maxPrice);
-    if (!isNaN(maxPrice)) {
-      if (query["pricing.adults"]) {
-        query["pricing.adults"].$lte = maxPrice;
-      } else {
-        query["pricing.adults"] = { $lte: maxPrice };
-      }
+
+  // ✅ AGE GROUP - NOW FIXED!
+  if (filters.ageGroup && filters.ageGroup.trim()) {
+    // Map frontend values to database values
+    const ageGroupMap = {
+      "": "",
+      adults_only: "Adults Only",
+      family: "Family Friendly",
+      kids: "Kids",
+    };
+
+    const mappedAgeGroup = ageGroupMap[filters.ageGroup] || filters.ageGroup;
+    if (mappedAgeGroup) {
+      query.ageGroup = mappedAgeGroup;
     }
   }
 
-  console.log("🔍 Filter Query:", query); // Debug log
+  // Status filter
+  if (filters.status) {
+    query.status = filters.status;
+  }
+
+  // ✅ MIN PRICE - now checks both 'price' and 'pricing.adults'
+  if (filters.minPrice) {
+    const minPrice = parseFloat(filters.minPrice);
+    if (!isNaN(minPrice)) {
+      query.$or = query.$or || [];
+      query.$or.push(
+        { "pricing.adults": { $gte: minPrice } },
+        { price: { $gte: minPrice } },
+      );
+    }
+  }
+
+  // ✅ MAX PRICE - now checks both 'price' and 'pricing.adults'
+  if (filters.maxPrice) {
+    const maxPrice = parseFloat(filters.maxPrice);
+    if (!isNaN(maxPrice)) {
+      if (!query.$or) {
+        query.$or = [];
+      }
+      query.$or.push(
+        { "pricing.adults": { $lte: maxPrice } },
+        { price: { $lte: maxPrice } },
+      );
+    }
+  }
+
+  // Handle combined min and max price
+  if (filters.minPrice && filters.maxPrice) {
+    const minPrice = parseFloat(filters.minPrice);
+    const maxPrice = parseFloat(filters.maxPrice);
+
+    if (!isNaN(minPrice) && !isNaN(maxPrice)) {
+      query.$and = [
+        {
+          $or: [
+            { "pricing.adults": { $gte: minPrice, $lte: maxPrice } },
+            { price: { $gte: minPrice, $lte: maxPrice } },
+          ],
+        },
+      ];
+    }
+  }
+
+  console.log("🔍 Filter Query:", JSON.stringify(query, null, 2)); // Debug
   const results = await Tour.find(query);
-  console.log(`📊 Found ${results.length} tours`); // Debug log
+  console.log(`📊 Found ${results.length} tours`); // Debug
 
   return results;
 }

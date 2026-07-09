@@ -20,22 +20,42 @@ import {
   Check,
 } from "@mui/icons-material";
 import { useState } from "react";
+import axios from "axios";
+// import { API_BASE_URL } from "../pages/Home";
 
-export function TourCard({ tour, onBook }) {
+export function TourCard({ tour, onBook, onRefresh }) {
   const [adultsCount, setAdultsCount] = useState(1);
   const [childrenCount, setChildrenCount] = useState(0);
-
   const availableSpots = tour.totalSpots - tour.bookedSpots;
   const isAvailable = availableSpots > 0;
 
-  const handleBook = () => {
-    onBook({
-      tourId: tour._id,
-      adultsCount,
-      childrenCount,
-    });
-    setAdultsCount(1);
-    setChildrenCount(0);
+  // const handleBook = () => {
+  //   onBook({
+  //     tourId: tour._id,
+  //     adultsCount,
+  //     childrenCount,
+  //   });
+  //   setAdultsCount(1);
+  //   setChildrenCount(0);
+  // };
+
+  const API_BASE_URL = "http://localhost:3001/api";
+
+  const handleBook = async () => {
+    try {
+      await onBook({
+        tourId: tour._id,
+        adultsCount,
+        childrenCount,
+      });
+
+      setAdultsCount(1);
+      setChildrenCount(0);
+
+      onRefresh();
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
   const getStatusColor = () => {
@@ -61,6 +81,19 @@ export function TourCard({ tour, onBook }) {
         return "Sold Out";
       default:
         return "Unknown";
+    }
+  };
+
+  const handleCancelBooking = async () => {
+    try {
+      await axios.post(`${API_BASE_URL}/tours/cancel`, {
+        tourId: tour._id,
+      });
+
+      alert("Booking cancelled!");
+      onRefresh();
+    } catch (err) {
+      alert(err.message);
     }
   };
 
@@ -187,7 +220,7 @@ export function TourCard({ tour, onBook }) {
       </CardContent>
 
       {/* Actions */}
-      <CardActions>
+      {/* <CardActions>
         <Button
           variant="contained"
           color={isAvailable ? "primary" : "error"}
@@ -198,6 +231,30 @@ export function TourCard({ tour, onBook }) {
         >
           {isAvailable ? "Book Now" : "Sold Out"}
         </Button>
+      </CardActions> */}
+      <CardActions>
+        {tour.status === "available" && (
+          <Button variant="contained" fullWidth onClick={handleBook}>
+            Book Now
+          </Button>
+        )}
+
+        {tour.status === "prebooked" && (
+          <Button
+            variant="contained"
+            color="warning"
+            fullWidth
+            onClick={handleCancelBooking}
+          >
+            Cancel Booking
+          </Button>
+        )}
+
+        {tour.status === "sold_out" && (
+          <Button variant="contained" color="error" disabled fullWidth>
+            Sold Out
+          </Button>
+        )}
       </CardActions>
     </Card>
   );

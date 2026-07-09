@@ -46,3 +46,19 @@ export async function bookTour(req, res) {
     res.status(400).json({ error: error.message });
   }
 }
+
+export async function cancelBooking(req, res) {
+  try {
+    const { tourId } = req.body;
+
+    const updatedTour = await tourService.changeStatus(tourId, "available");
+
+    res.status(200).json({
+      success: true,
+      message: "Booking cancelled successfully",
+      tour: updatedTour,
+    });
+  } catch (err) {
+    res.status(500).json({ error: error.message });
+  }
+}
